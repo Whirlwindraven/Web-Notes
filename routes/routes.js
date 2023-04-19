@@ -1,7 +1,7 @@
 const fileSystem = require('fs').promises;
 const filePath = require('path');
 
-module.exports = async server => {
+module.exports = async app => {
   let noteArray;
   try {
     const fileData = await fileSystem.readFile('db/db.json', 'utf-8');
@@ -11,35 +11,36 @@ module.exports = async server => {
     process.exit(1);
   }
 
-  server.get('/api/notes', (request, response) => {
+  app.get('/api/notes', (request, response) => {
     response.json(noteArray);
   });
 
-  server.post('/api/notes', async (request, response) => {
+  app.post('/api/notes', async (request, response) => {
     const addedNote = request.body;
     noteArray.push(addedNote);
     await syncDb();
     return response.status(201).json({ message: 'Note added successfully' });
   });
 
-  server.get('/api/notes/:id', (request, response) => {
+  app.get('/api/notes/:id', (request, response) => {
     response.json(noteArray[request.params.id]);
   });
 
-  server.delete('/api/notes/:id', async (request, response) => {
+  app.delete('/api/notes/:id', async (request, response) => {
     noteArray.splice(request.params.id, 1);
     await syncDb();
     return response.json({ message: 'Note deleted successfully' });
   });
 
-  server.get('/notes', (request, response) => {
+  app.get('/notes', (request, response) => {
     response.sendFile(filePath.join(__dirname, '../public/notes.html'));
   });
 
-  server.get('*', (request, response) => {
+  app.get('*', (request, response) => {
     response.sendFile(filePath.join(__dirname, '../public/index.html'));
   });
 
+  //  Updates JSON file based on note interactions 
   async function syncDb() {
     try {
       await fileSystem.writeFile('db/db.json', JSON.stringify(noteArray, null, 2));
