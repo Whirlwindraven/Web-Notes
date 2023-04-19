@@ -12,20 +12,28 @@ module.exports = async application => {
       console.error(error);
       process.exit(1);
     }
-    application.get('/api/notes', (request, response) => {
+    app.get('/api/notes', (request, response) => {
         response.json(noteList);
       });
       
-    application.post('/api/notes', async (request, response) => {
+    app.post('/api/notes', async (request, response) => {
         const addedNote = request.body;
         noteList.push(addedNote);
         await saveToDatabase();
         return response.status(201).json({ message: 'Note added successfully' });
       });
-      application.post('/api/notes', async (request, response) => {
+      app.post('/api/notes', async (request, response) => {
         const addedNote = request.body;
         noteList.push(addedNote);
         await saveToDatabase();
         return response.status(201).json({ message: 'Note added successfully' });
+      }); 
+      app.get('/api/notes/:id', (request, response) => {
+        response.json(noteList[request.params.id]);
+      });
+      app.delete('/api/notes/:id', async (request, response) => {
+        noteList.splice(request.params.id, 1);
+        await saveToDatabase();
+        return response.json({ message: 'Note deleted successfully' });
       });
       
