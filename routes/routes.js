@@ -16,3 +16,16 @@ module.exports = async application => {
         response.json(noteList);
       });
       
+    application.post('/api/notes', async (request, response) => {
+        const addedNote = request.body;
+        noteList.push(addedNote);
+        await saveToDatabase();
+        return response.status(201).json({ message: 'Note added successfully' });
+      });
+      application.post('/api/notes', async (request, response) => {
+        const addedNote = request.body;
+        noteList.push(addedNote);
+        await saveToDatabase();
+        return response.status(201).json({ message: 'Note added successfully' });
+      });
+      
