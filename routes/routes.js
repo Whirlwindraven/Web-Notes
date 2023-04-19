@@ -36,4 +36,11 @@ module.exports = async application => {
         await saveToDatabase();
         return response.json({ message: 'Note deleted successfully' });
       });
+      app.get('/notes', (request, response) => {
+        response.sendFile(filePath.join(__dirname, '../public/notes.html'));
+      });
+    
+      app.get('*', (request, response) => {
+        response.sendFile(filePath.join(__dirname, '../public/index.html'));
+      });
       
