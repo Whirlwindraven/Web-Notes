@@ -1,5 +1,6 @@
 const fileSystem = require('fs').promises;
 const filePath = require('path');
+const { v4: uuidv4 } = require('uuid');
 
 module.exports = async app => {
   let noteArray;
@@ -17,17 +18,18 @@ module.exports = async app => {
 
   app.post('/api/notes', async (request, response) => {
     const addedNote = request.body;
+    addedNote.id = uuidv4(); // This will assign a unique id to the note
     noteArray.push(addedNote);
     await syncDb();
     return response.status(201).json({ message: 'Note added successfully' });
   });
 
   app.get('/api/notes/:id', (request, response) => {
-    response.json(noteArray[request.params.id]);
+    response.json(noteArray.find(note => note.id === request.params.id));
   });
 
   app.delete('/api/notes/:id', async (request, response) => {
-    noteArray.splice(request.params.id, 1);
+    noteArray = noteArray.filter(note => note.id !== request.params.id);
     await syncDb();
     return response.json({ message: 'Note deleted successfully' });
   });
@@ -40,7 +42,7 @@ module.exports = async app => {
     response.sendFile(filePath.join(__dirname, '../public/index.html'));
   });
 
-  //  Updates JSON file based on note interactions 
+  // Updates JSON file based on note interactions 
   async function syncDb() {
     try {
       await fileSystem.writeFile('db/db.json', JSON.stringify(noteArray, null, 2));
