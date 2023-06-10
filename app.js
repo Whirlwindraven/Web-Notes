@@ -10,10 +10,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static('public'));
 
-// Define Routes
-app.get('/', (req, res) => {
-  res.send('Hello, world!');
-});
+// Require Routes
+require('./routes/routes')(app);
 
 // Setup listener
 app.listen(PORT, function() {
